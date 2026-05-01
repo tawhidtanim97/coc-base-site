@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Base List</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { min-height: 100vh; min-height: 100dvh; background: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 70px 12px 30px; color: #fff; }
+    .back { position: fixed; top: 12px; left: 12px; z-index: 2; color: #fff; text-decoration: none; font-size: 0.9rem; background: rgba(255,255,255,0.1); padding: 10px 16px; border-radius: 10px; }
+    h1 { font-size: clamp(1.2rem, 5vw, 2.2rem); text-align: center; margin-bottom: 6px; font-weight: 800; }
+    .info { color: #777; text-align: center; margin-bottom: 24px; font-size: 0.85rem; }
+    .base-grid { display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 500px; margin: 0 auto; }
+    .card { background: rgba(255,255,255,0.06); border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); }
+    .card-img-wrap { width: 100%; height: 180px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; }
+    .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-img-wrap .img-error { color: #8B0000; font-size: 0.85rem; text-align: center; padding: 20px; }
+    .card-body { padding: 16px; }
+    .card-title { color: #fff; font-size: 1rem; margin-bottom: 12px; font-weight: 600; }
+    .copy-btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 10px; color: #fff; font-weight: 700; text-decoration: none; text-align: center; font-size: 0.95rem; }
+    .copy-war { background: linear-gradient(135deg, #8B0000, #DC143C); }
+    .copy-rank { background: linear-gradient(135deg, #00008B, #4169E1); }
+    .copy-farm { background: linear-gradient(135deg, #006400, #32CD32); }
+    .copy-cwl { background: linear-gradient(135deg, #4B0082, #8A2BE2); }
+    .empty { color: #555; text-align: center; font-size: 1rem; padding: 50px 20px; line-height: 1.6; }
+    .loading { color: #888; text-align: center; padding: 40px; }
+    .zoom-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; }
+    .zoom-overlay.active { display: flex; }
+    .zoom-overlay img { max-width: 95%; max-height: 85%; object-fit: contain; border-radius: 8px; }
+    @media (min-width: 640px) { .base-grid { grid-template-columns: repeat(2, 1fr); max-width: 800px; } .card-img-wrap { height: 220px; cursor: zoom-in; } }
+    @media (min-width: 1024px) { .base-grid { grid-template-columns: repeat(3, 1fr); max-width: 1100px; } }
+  </style>
+</head>
+<body>
+  <a href="th.html" class="back">← Back</a>
+  <h1 id="pageTitle">Bases</h1>
+  <p class="info" id="info"></p>
+  <div class="loading" id="loading">Loading bases...</div>
+  <div class="base-grid" id="baseGrid" style="display:none;"></div>
+  <div class="zoom-overlay" id="zoomOverlay" onclick="closeZoom()">
+    <img id="zoomImg" src="" alt="Zoom">
+  </div>
+  <script>
+    const type = localStorage.getItem('selectedType') || 'war';
+    const th = localStorage.getItem('selectedTH') || '16';
+    const typeNames = { war: 'War', rank: 'Ranked', farm: 'Farming', cwl: 'CWL' };
+    const copyClass = 'copy-' + type;
+    document.getElementById('pageTitle').textContent = typeNames[type] + ' — TH' + th;
+    document.getElementById('info').textContent = typeNames[type] + ' bases for Town Hall ' + th;
+
+    async function loadBases() {
+      try {
+        const res = await fetch('bases.json');
+        const allBases = await res.json();
+        const filtered = allBases.filter(b => b.type === type && b.th === th);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('baseGrid').style.display = 'grid';
+        const grid = document.getElementById('baseGrid');
+        if (filtered.length === 0) {
+          grid.innerHTML = '<div class="empty">No bases found.<br>Ask admin to add.</div>';
+        } else {
+          filtered.forEach((base, idx) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const imgId = 'img-' + idx;
+            card.innerHTML = `
+              <div class="card-img-wrap" onclick="openZoom('${base.image}')">
+                <img id="${imgId}" src="${base.image}" alt="Base" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=img-error>Image failed</div>'">
+              </div>
+              <div class="card-body">
+                <div class="card-title">${typeNames[type]} Base #${idx + 1}</div>
+                <a href="${base.link}" target="_blank" class="copy-btn ${copyClass}">🔗 Copy Base Link</a>
+              </div>`;
+            grid.appendChild(card);
+          });
+        }
+      } catch (e) {
+        document.getElementById('loading').textContent = 'Failed to load bases.json';
+      }
+    }
+    function openZoom(src) { if (!src) return; document.getElementById('zoomImg').src = src; document.getElementById('zoomOverlay').classList.add('active'); document.body.style.overflow = 'hidden'; }
+    function closeZoom() { document.getElementById('zoomOverlay').classList.remove('active'); document.body.style.overflow = ''; }
+    loadBases();
+  </script>
+</body>
+</html>

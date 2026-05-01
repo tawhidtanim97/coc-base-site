@@ -1,0 +1,26 @@
+[
+  {
+    "image": "https://i.postimg.cc/abc123/war-th16-1.jpg",
+    "link": "https://link.clashofclans.com/en?action=OpenLayout&id=TH16:WB:2:AAAAAA:BBBBB",
+    "type": "war",
+    "th": "16"
+  },
+  {
+    "image": "https://i.postimg.cc/def456/farm-th16-1.jpg",
+    "link": "https://link.clashofclans.com/en?action=OpenLayout&id=TH16:FB:2:CCCCCC:DDDDD",
+    "type": "farm",
+    "th": "16"
+  },
+  {
+    "image": "https://i.postimg.cc/ghi789/cwl-th15-1.jpg",
+    "link": "https://link.clashofclans.com/en?action=OpenLayout&id=TH15:CB:2:EEEEEE:FFFFF",
+    "type": "cwl",
+    "th": "15"
+  },
+  {
+    "image": "https://i.postimg.cc/jkl012/rank-th14-1.jpg",
+    "link": "https://link.clashofclans.com/en?action=OpenLayout&id=TH14:RB:2:GGGGGG:HHHHH",
+    "type": "rank",
+    "th": "14"
+  }
+]

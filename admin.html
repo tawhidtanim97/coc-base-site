@@ -1,49 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Add Base</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Admin Panel</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { min-height: 100vh; min-height: 100dvh; background: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 70px 16px 30px; color: #fff; }
+    .back { position: fixed; top: 12px; left: 12px; z-index: 2; color: #fff; text-decoration: none; font-size: 0.9rem; background: rgba(255,255,255,0.1); padding: 10px 16px; border-radius: 10px; }
+    h1 { font-size: clamp(1.3rem, 5vw, 2.2rem); margin-bottom: 24px; text-align: center; font-weight: 800; }
+    .form-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; max-width: 480px; margin: 0 auto; }
+    .form-group { margin-bottom: 18px; }
+    label { display: block; color: #999; margin-bottom: 8px; font-size: 0.85rem; font-weight: 500; }
+    input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: #fff; font-size: 1rem; outline: none; -webkit-appearance: none; }
+    .save-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(135deg, #4B0082, #8A2BE2); color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 12px; }
+    .save-btn:active { filter: brightness(1.2); }
+    .github-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(135deg, #333, #666); color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; }
+    .github-btn:active { filter: brightness(1.2); }
+    .msg { margin-top: 14px; text-align: center; min-height: 22px; font-size: 0.9rem; font-weight: 600; }
+    .list { margin-top: 32px; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .list h2 { margin-bottom: 16px; font-size: 1.2rem; font-weight: 700; }
+    .base-item { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08); }
+    .base-info { color: #bbb; font-size: 0.85rem; line-height: 1.5; }
+    .base-info b { color: #fff; }
+    .base-info span { color: #666; display: block; margin-top: 4px; word-break: break-all; }
+    .del-btn { background: #8B0000; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600; margin-top: 10px; }
+    .del-btn:active { background: #DC143C; }
+    @media (min-width: 640px) { .base-item { display: flex; justify-content: space-between; align-items: center; } .del-btn { margin-top: 0; } }
+  </style>
 </head>
 <body>
+  <a href="index.html" class="back">← Home</a>
+  <h1>⚙️ Admin Panel</h1>
+  <div class="form-box">
+    <div class="form-group">
+      <label>GitHub Token</label>
+      <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
+    </div>
+    <div class="form-group">
+      <label>Repo (username/repo-name)</label>
+      <input type="text" id="githubRepo" placeholder="tawhid/coc-base-hub">
+    </div>
+    <div class="form-group">
+      <label>Image URL</label>
+      <input type="text" id="imgUrl" placeholder="https://i.postimg.cc/...">
+    </div>
+    <div class="form-group">
+      <label>Base Link</label>
+      <input type="text" id="baseLink" placeholder="https://link.clashofclans.com/...">
+    </div>
+    <div class="form-group">
+      <label>Type</label>
+      <select id="baseType"><option value="war">War</option><option value="rank">Ranked</option><option value="farm">Farming</option><option value="cwl">CWL</option></select>
+    </div>
+    <div class="form-group">
+      <label>Town Hall</label>
+      <select id="baseTH">
+        <option value="6">TH6</option><option value="7">TH7</option><option value="8">TH8</option><option value="9">TH9</option><option value="10">TH10</option><option value="11">TH11</option><option value="12">TH12</option><option value="13">TH13</option><option value="14">TH14</option><option value="15">TH15</option><option value="16">TH16</option><option value="17">TH17</option><option value="18">TH18</option>
+      </select>
+    </div>
+    <button class="save-btn" onclick="addLocal()">💾 Add to List</button>
+    <button class="github-btn" onclick="saveToGitHub()">🚀 Save to Website</button>
+  </div>
+  <div class="msg" id="msg"></div>
+  <div class="list">
+    <h2>📋 Current Bases</h2>
+    <div id="baseList"></div>
+  </div>
+  <script>
+    let currentBases = [];
 
-<h2>Add New Base</h2>
+    function addLocal() {
+      const image = document.getElementById('imgUrl').value.trim();
+      const link = document.getElementById('baseLink').value.trim();
+      const type = document.getElementById('baseType').value;
+      const th = document.getElementById('baseTH').value;
+      if (!image || !link) { showMsg('Fill all fields!', true); return; }
+      currentBases.push({ image, link, type, th });
+      document.getElementById('imgUrl').value = '';
+      document.getElementById('baseLink').value = '';
+      showMsg('Added to list. Now click Save to Website.');
+      renderList();
+    }
 
-<input id="img" placeholder="Image URL"><br>
-<input id="link" placeholder="Base Link"><br>
+    async function saveToGitHub() {
+      const token = document.getElementById('githubToken').value.trim();
+      const repo = document.getElementById('githubRepo').value.trim();
+      if (!token || !repo) { showMsg('Enter GitHub token & repo!', true); return; }
+      if (currentBases.length === 0) { showMsg('Add at least one base first!', true); return; }
+      showMsg('Saving to GitHub...');
+      try {
+        // Get current bases.json
+        const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/bases.json`, {
+          headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+        });
+        if (!getRes.ok) throw new Error('Failed to get file');
+        const getData = await getRes.json();
+        const sha = getData.sha;
+        const existing = JSON.parse(atob(getData.content));
+        
+        // Merge
+        const merged = [...existing, ...currentBases];
+        const content = btoa(JSON.stringify(merged, null, 2));
+        
+        // Update file
+        const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/bases.json`, {
+          method: 'PUT',
+          headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'Add new bases', content: content, sha: sha })
+        });
+        if (putRes.ok) {
+          currentBases = [];
+          showMsg('✓ Saved! Wait 1 min for update.');
+          renderList();
+        } else {
+          const err = await putRes.json();
+          showMsg('Error: ' + err.message, true);
+        }
+      } catch (e) { showMsg('Error: ' + e.message, true); }
+    }
 
-<select id="type">
-  <option value="war">War</option>
-  <option value="rank">Rank</option>
-  <option value="farm">Farm</option>
-  <option value="cwl">CWL</option>
-</select>
-
-<select id="th"></select>
-
-<br><br>
-<button onclick="saveBase()">Save</button>
-
-<script>
-let thSelect = document.getElementById("th");
-for(let i=6;i<=18;i++){
-  thSelect.innerHTML += `<option value="${i}">TH ${i}</option>`;
-}
-
-function saveBase(){
-  let img = document.getElementById("img").value;
-  let link = document.getElementById("link").value;
-  let type = document.getElementById("type").value;
-  let th = document.getElementById("th").value;
-
-  let data = JSON.parse(localStorage.getItem("bases")) || [];
-
-  data.push({img, link, type, th});
-
-  localStorage.setItem("bases", JSON.stringify(data));
-
-  alert("Base Saved!");
-}
-</script>
-
+    function showMsg(text, err) { const el = document.getElementById('msg'); el.textContent = text; el.style.color = err ? '#ff4444' : '#32CD32'; setTimeout(() => el.textContent = '', 4000); }
+    
+    function renderList() {
+      const container = document.getElementById('baseList');
+      if (currentBases.length === 0) { container.innerHTML = '<div style="color:#555;text-align:center;padding:20px;">No bases in list.</div>'; return; }
+      container.innerHTML = '';
+      currentBases.forEach((b, i) => {
+        const div = document.createElement('div');
+        div.className = 'base-item';
+        div.innerHTML = `<div class="base-info"><b>${b.type.toUpperCase()}</b> — TH${b.th}<br><span>${b.image}</span></div><button class="del-btn" onclick="removeLocal(${i})">Remove</button>`;
+        container.appendChild(div);
+      });
+    }
+    
+    function removeLocal(index) { currentBases.splice(index, 1); renderList(); }
+  </script>
 </body>
 </html>
