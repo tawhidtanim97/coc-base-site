@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Base</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Add New Base</h2>
+
+<input id="img" placeholder="Image URL"><br>
+<input id="link" placeholder="Base Link"><br>
+
+<select id="type">
+  <option value="war">War</option>
+  <option value="rank">Rank</option>
+  <option value="farm">Farm</option>
+  <option value="cwl">CWL</option>
+</select>
+
+<select id="th"></select>
+
+<br><br>
+<button onclick="saveBase()">Save</button>
+
+<script>
+let thSelect = document.getElementById("th");
+for(let i=6;i<=18;i++){
+  thSelect.innerHTML += `<option value="${i}">TH ${i}</option>`;
+}
+
+function saveBase(){
+  let img = document.getElementById("img").value;
+  let link = document.getElementById("link").value;
+  let type = document.getElementById("type").value;
+  let th = document.getElementById("th").value;
+
+  let data = JSON.parse(localStorage.getItem("bases")) || [];
+
+  data.push({img, link, type, th});
+
+  localStorage.setItem("bases", JSON.stringify(data));
+
+  alert("Base Saved!");
+}
+</script>
+
+</body>
+</html>

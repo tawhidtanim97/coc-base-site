@@ -1,0 +1,65 @@
+body {
+  background: #111;
+  color: white;
+  text-align: center;
+  font-family: Arial;
+}
+
+.menu button {
+  padding: 15px;
+  margin: 10px;
+  border: none;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.war { background: red; }
+.rank { background: blue; }
+.farm { background: green; }
+.cwl { background: purple; }
+
+#thButtons button {
+  color: white;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 8px;
+}
+
+.card {
+  background: #222;
+  padding: 15px;
+  margin: 15px;
+  border-radius: 10px;
+}
+
+/* image */
+.base-img {
+  width: 300px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.base-img:hover {
+  transform: scale(1.05);
+}
+
+/* popup preview */
+.img-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.img-modal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+}
